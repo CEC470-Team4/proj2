@@ -18,6 +18,8 @@ unsigned char IR = 0;
 unsigned int MAR = 0;
 unsigned int PC = 0;
 
+unsigned int IR_mask = 0b11111000; // obtains the five MSBs of IR
+
 int main(int argc, char * argv[])
 {
     // execution loop
