@@ -19,7 +19,6 @@ unsigned int MAR = 0;
 unsigned int PC = 0;
 
 unsigned int IR_mask = 0b11111000; // obtains the five MSBs of IR
-
 int main(int argc, char * argv[])
 {
     // execution loop
@@ -54,36 +53,60 @@ void executeInstruction(void)
         // DO NOTHING
         
     }
+    else if (IR AND )
+    {
+        branch();
+    }
+    
+}
 
-    else
-
+void branch ()
+{
     switch(IR)
     {
         case 0: // 000 - BRA
 
+
             break;
 
         case 1: // 001 - BRZ
+            if (ACC = 0 ){
+                //Branch
+            }
 
             break;
 
         case 2: // 010 - BNE
+            if (ACC != 0 ){
+                //Branch
+            }
 
             break;
 
         case 3: // 011 - BLT
+            if (ACC < 0 ){
+                //Branch
+            }
 
             break;
 
         case 4: // 100 - BLE
+            if (ACC <= 0 ){
+                //Branch
+            }
 
             break;
  
         case 5: // 101 - BGT
-
+            if (ACC > 0 ){
+                //Branch
+            }
             break;
 
         case 6: // 110 - BGE
+            if (ACC >= 0 ){
+                //Branch
+            }
 
             break;
     }
