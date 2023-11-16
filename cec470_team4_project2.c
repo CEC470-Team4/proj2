@@ -11,6 +11,8 @@
 
 void fetchNextInstruction(void);
 void executeInstruction(void);
+void branch(void);
+void method(void);
 
 unsigned char memory[65536];
 unsigned char ACC = 0;
@@ -18,7 +20,10 @@ unsigned char IR = 0;
 unsigned int MAR = 0;
 unsigned int PC = 0;
 
-unsigned int IR_mask = 0b11111000; // obtains the five MSBs of IR
+unsigned int IR_branchmask = 0b11111000; // obtains the five MSBs of IR
+unsigned int IR_methodmask = 0b11110000; ///obtains the five MSBs of IR
+
+
 int main(int argc, char * argv[])
 {
     // execution loop
@@ -53,9 +58,13 @@ void executeInstruction(void)
         // DO NOTHING
         
     }
-    else if (IR AND )
+    else if (((IR & IR_branchmask) >> 3) == 2)
     {
         branch();
+    }
+    else if (((IR & IR_methodmask) >> 3) == 0)
+    {
+        method();
     }
     
 }
@@ -65,8 +74,7 @@ void branch ()
     switch(IR)
     {
         case 0: // 000 - BRA
-
-
+            //Branch
             break;
 
         case 1: // 001 - BRZ
@@ -110,4 +118,10 @@ void branch ()
 
             break;
     }
+
+
+}
+void method()
+{
+    
 }
