@@ -76,7 +76,7 @@ void branch ()
             break;
 
         case 1: // 001 - BRZ
-            if (ACC = 0 ){
+            if (ACC == 0 ){
                 //Branch
             }
 
