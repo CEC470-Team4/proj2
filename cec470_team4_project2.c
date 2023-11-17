@@ -24,7 +24,8 @@ unsigned int IR_branch_mask = 0b11111000; // obtains the five MSBs of IR
 unsigned int IR_method_mask = 0b11110000; ///obtains the four MSBs of IR
 unsigned int IR_mem_fuction_mask = 0b00001000;
 unsigned int IR_mem_register_mask = 0b00000100;
-unsigned int IR_mem_method_mask = 0b00000011;
+unsigned int IR_2_LSB_mask = 0b00000011;
+unsigned int IR_MSB_mask = 0b10000000;
 
 
 
@@ -70,7 +71,10 @@ void executeInstruction(void) //Milan and Tabitha
     {
         memOp();
     }
-    
+    else if (((IR & IR_MSB_mask)>> 7) == 1)
+    {
+
+    }
 }
 
 void branch () //Milan and Tabitha
@@ -150,7 +154,7 @@ void memOpReg() //Tabitha
 
 void memOpMeth()
 {
-    switch (IR & IR_mem_method_mask)
+    switch (IR & IR_2_LSB_mask)
     {
         case 0: 
         //Operand is used as address
