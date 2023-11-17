@@ -10,11 +10,8 @@
 void fetchNextInstruction(void);
 void executeInstruction(void);
 void branch(void);
-void memOpReg(void);
-void memOpMeth(void);
-void MathOpFunction(void);
-void MathOpDesination(void);
-void MathOpSource(void);
+void memOp(void);
+void MathOp(void);
 
 unsigned char memory[65536];
 unsigned char ACC = 0;
@@ -73,7 +70,7 @@ void executeInstruction(void) //Milan and Tabitha
     // Mathematical operations
     else if ((IR >> 7))
     {
-        MathOpDesination();
+        MathOp();
     }
 
     else if (((IR & IR_branch_mask) >> 3) == 2)
@@ -83,16 +80,8 @@ void executeInstruction(void) //Milan and Tabitha
 
     else if (((IR & IR_method_mask) >> 3) == 0)
     {
-        if ((IR & IR_mem_fuction_mask) == 0)
-        {
-            //Store
-        }
-         else 
-        {
-            //Load
-
-        }
-        memOpReg;
+        
+        memOp;
     }
 }
 
@@ -149,7 +138,7 @@ void branch () //Milan and Tabitha
 
 }
 
-void MathOpFunction() //Tabitha
+void MathOp() //Tabitha
 {
     switch((IR & IR_Math_fuction_mask)>> 4)
     {
@@ -186,58 +175,58 @@ void MathOpFunction() //Tabitha
         //NOT
         break;
 
-        MathOpDestination();
-    }
-}
-
-void MathOpDestination() //Tabitha
-{
-    switch ((IR & IR_Math_desintation_mask)>>2)
-    {
-        case 0:
-        //Indirect (MAR used as a pointer)
-        break;
+        switch ((IR & IR_Math_desintation_mask)>>2)
+        {
+            case 0:
+            //Indirect (MAR used as a pointer)
+            break;
         
-        case 1:
-        //Accumlator ACC
-        break;
+            case 1:
+            //Accumlator ACC
+            break;
 
-        case 2: 
-        //Address register MAR
-        break;
+            case 2: 
+            //Address register MAR
+            break;
 
-        case 3:
-        //Memory
-        break;
+            case 3:
+            //Memory
+            break;
 
-        MathOpSource();
+            switch ((IR & IR_2_LSB_mask))
+            {
+                case 0:
+                //Indirect (MAR used as a pointer)
+                break;
+
+                case 1:
+                //Accumulator ACC
+                break;
+
+                case 2: 
+                //Constant 
+                break;
+
+                case 3: 
+                //Memory
+                break;
+            }
+        }
     }
 }
 
-void MathOpSource() //Tabitha
+void memOp() //Tabitha
 {
-    switch ((IR & IR_2_LSB_mask))
-    {
-        case 0:
-        //Indirect (MAR used as a pointer)
-        break;
+     if ((IR & IR_mem_fuction_mask) == 0)
+        {
+            //Store
+        }
+         else 
+        {
+            //Load
 
-        case 1:
-        //Accumulator ACC
-        break;
+        }
 
-        case 2: 
-        //Constant 
-        break;
-
-        case 3: 
-        //Memory
-        break;
-    }
-}
-
-void memOpReg() //Tabitha
-{
      if ((IR & IR_mem_register_mask)== 0)
      {
         //Accumulator ACC
@@ -246,11 +235,7 @@ void memOpReg() //Tabitha
      {
         //Index register MAR
      }
-    memOpMeth();
-}
-
-void memOpMeth()
-{
+    
     switch (IR & IR_2_LSB_mask)
     {
         case 0: 
@@ -265,6 +250,4 @@ void memOpMeth()
         //Indirect(MAR used as pointer)
         break;
     }
-
-
 }
