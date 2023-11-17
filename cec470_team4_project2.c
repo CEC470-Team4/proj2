@@ -12,9 +12,9 @@ void executeInstruction(void);
 void branch(void);
 void memOpReg(void);
 void memOpMeth(void);
-void MathOpFunction(void);
+void mathOpFunc(void);
 void MathOpDesination(void);
-void MathOpSource(void);
+void mathOpSrc(void);
 
 unsigned char memory[65536];
 unsigned char ACC = 0;
@@ -24,12 +24,14 @@ unsigned int PC = 0;
 
 unsigned int IR_branch_mask = 0b11111000; // obtains the five MSBs of IR
 unsigned int IR_branch_type_mask = 0b00000111; // obtains the five MSBs of IR
-unsigned int IR_method_mask = 0b11110000; ///obtains the four MSBs of IR
+unsigned int IR_mem_ops_mask = 0b11110000; ///obtains the four MSBs of IR
 unsigned int IR_mem_fuction_mask = 0b00001000;
 unsigned int IR_mem_register_mask = 0b00000100;
-unsigned int IR_2_LSB_mask = 0b00000011;
-unsigned int IR_Math_fuction_mask = 0b01110000;
-unsigned int IR_Math_desintation_mask = 0b00001100;
+
+unsigned int IR_math_func_mask = 0b01110000;
+unsigned int IR_math_dst_mask = 0b00001100;
+
+unsigned int IR_2_lsb_mask = 0b00000011;
 
 
 
@@ -56,7 +58,7 @@ void fetchNextInstruction(void)
 
 void executeInstruction(void) //Milan and Tabitha
 {
-    // checks for HALT or NOP opcodes first
+    // check for HALT or NOP opcodes first
     if (IR == HALT_OPCODE)
     {
         // HALT
@@ -69,24 +71,27 @@ void executeInstruction(void) //Milan and Tabitha
         fetchNextInstruction();
     }
 
-    // checks for the rest
+    // check for the rest
 
     // Mathematical operations
     else if ((IR >> 7))
     {
-        MathOpFunction();
+        mathOpFunc();
     }
 
+    // Memory Operations
+    else if (((IR & IR_mem_ops_mask) >> 3) == 0)
+    {
+        memOpReg();
+    }
+
+    // Branches/Jumps:
     else if (((IR & IR_branch_mask) >> 3) == 2)
     {
         branch();
     }
 
-    else if (((IR & IR_method_mask) >> 3) == 0)
-    {
-        
-        memOpReg;
-    }
+
 }
 
 void branch () //Milan and Tabitha
@@ -129,6 +134,7 @@ void branch () //Milan and Tabitha
             if (ACC > 0 ){
                 //Branch
             }
+
             break;
 
         case 6: // 0b110 - BGE
@@ -142,13 +148,12 @@ void branch () //Milan and Tabitha
 
 }
 
-void MathOpFunction() //Tabitha
+void mathOpFunc() //Tabitha
 {
-    switch((IR & IR_Math_fuction_mask)>> 4)
+    switch((IR & IR_math_func_mask)>> 4)
     {
         case 0:
         //AND
-
         break;
 
         case 1:
@@ -179,13 +184,13 @@ void MathOpFunction() //Tabitha
         //NOT
         break;
 
-        MathOpDestination();
+        mathOpDst();
     }
 }
 
-void MathOpDestination() //Tabitha
+void mathOpDst() //Tabitha
 {
-    switch ((IR & IR_Math_desintation_mask)>>2)
+    switch ((IR & IR_math_dst_mask)>>2)
     {
         case 0:
         //Indirect (MAR used as a pointer)
@@ -203,13 +208,13 @@ void MathOpDestination() //Tabitha
         //Memory
         break;
 
-        MathOpSource();
+        mathOpSrc();
     }
 }
 
-void MathOpSource() //Tabitha
+void mathOpSrc() //Tabitha
 {
-    switch ((IR & IR_2_LSB_mask))
+    switch ((IR & IR_2_lsb_mask))
     {
         case 0:
         //Indirect (MAR used as a pointer)
@@ -244,7 +249,7 @@ void memOpReg() //Tabitha
 
 void memOpMeth()
 {
-    switch (IR & IR_2_LSB_mask)
+    switch (IR & IR_2_lsb_mask)
     {
         case 0: 
         //Operand is used as address
