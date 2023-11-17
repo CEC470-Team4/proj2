@@ -10,6 +10,7 @@
 void fetchNextInstruction(void);
 void executeInstruction(void);
 void branch(void);
+void branch_function(void);
 void memOpReg(void);
 void memOpMeth(void);
 void mathOpFunc(void);
@@ -104,52 +105,40 @@ void branch () //Milan and Tabitha
     switch(IR & IR_branch_type_mask)
     {
         case 0: // 0b000 - BRA
-            //Branch
             break;
 
         case 1: // 0b001 - BRZ
-            if (ACC == 0 ){
-                //Branch
-            }
-
+            if (ACC == 0 )
             break;
 
         case 2: // 0b010 - BNE
-            if (ACC != 0 ){
-                //Branch
-            }
-
+            if (ACC != 0 )
             break;
 
         case 3: // 0b011 - BLT
-            if (ACC < 0 ){
-                //Branch
-            }
-
+            if (ACC < 0 )
             break;
 
         case 4: // 0b100 - BLE
-            if (ACC <= 0 ){
-                //Branch
-            }
-
+            if (ACC <= 0 )
             break;
  
         case 5: // 0b101 - BGT
-            if (ACC > 0 ){
-                //Branch
-            }
-
+            if (ACC > 0 )
             break;
 
         case 6: // 0b110 - BGE
-            if (ACC >= 0 ){
-                //Branch
-            }
-
+            if (ACC >= 0)
             break;
+        branch_function;
+
     }
 
+
+}
+
+void branch_function()
+{
 
 }
 
