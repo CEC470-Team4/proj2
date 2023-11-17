@@ -11,6 +11,8 @@ void fetchNextInstruction(void);
 void executeInstruction(void);
 void branch(void);
 void memOp(void);
+void memOpReg(void);
+void memOpMeth(void);
 
 unsigned char memory[65536];
 unsigned char ACC = 0;
@@ -19,7 +21,11 @@ unsigned int MAR = 0;
 unsigned int PC = 0;
 
 unsigned int IR_branchmask = 0b11111000; // obtains the five MSBs of IR
-unsigned int IR_methodmask = 0b11110000; ///obtains the five MSBs of IR
+unsigned int IR_methodmask = 0b11110000; ///obtains the four MSBs of IR
+unsigned int IR_memfuctionmask = 0b00001000;
+unsigned int IR_memregistermask = 0b00000100;
+unsigned int IR_memmethodmask = 0b00000011;
+
 
 
 int main(int argc, char * argv[])
@@ -43,7 +49,7 @@ void fetchNextInstruction(void)
     PC += 1; // increment PC by blah blah blah
 }
 
-void executeInstruction(void)
+void executeInstruction(void) //Milan and Tabitha
 {
     if (IR == HALT_OPCODE)
     {
@@ -67,7 +73,7 @@ void executeInstruction(void)
     
 }
 
-void branch ()
+void branch () //Milan and Tabitha
 {
     switch(IR)
     {
@@ -120,7 +126,44 @@ void branch ()
 
 }
 
-void memOp()
+void memOp() //Tabitha
 {
-    
+    if ((IR & IR_memfuctionmask) == 0)
+    {
+       memOpReg;
+    }
+    else 
+    {
+        memOpReg;
+    }
+}
+
+void memOpReg() //Tabitha
+{
+     if ((IR & IR_memregistermask)== 0){
+        memOpMeth();
+     }
+     else {
+        memOpMeth();
+     }
+}
+
+void memOpMeth()
+{
+    switch (IR & IR_memmethodmask)
+    {
+        case 0: 
+        //Operand is used as address
+        break;
+        
+        case 1:
+        //Operand is used as constant
+        break;
+
+        case 2:
+        //Indirect(MAR used as pointer)
+        break;
+    }
+
+
 }
