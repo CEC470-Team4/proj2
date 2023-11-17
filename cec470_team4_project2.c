@@ -24,6 +24,12 @@
 #define BRANCH_OPCODE 0x10
 #define BRANCH_TYPE 0x07
 
+unsigned char memory[65536];
+unsigned char ACC = 0;
+unsigned char IR = 0;
+unsigned int MAR = 0;
+unsigned int PC = 0;
+
 void fetchNextInstruction(void);
 void executeInstruction(void);
 
@@ -31,17 +37,12 @@ void mathOp(void);
 unsigned int mathOpSrc(void);
 unsigned int mathOpDst(void);
 
+void memOp(void);
+unsigned int memOpReg(void);
+unsigned int memOpMeth(void);
+
 void branch(void);
 void branch_func(void);
-
-void memOpReg(void);
-void memOpMeth(void);
-
-unsigned char memory[65536];
-unsigned char ACC = 0;
-unsigned char IR = 0;
-unsigned int MAR = 0;
-unsigned int PC = 0;
 
 int main(int argc, char * argv[])
 {
@@ -72,11 +73,11 @@ void executeInstruction(void) // Milan and Tabitha
         mathOp();
 
     // Memory operations
-    else if (((IR & IR_mem_ops_mask) >> 3) == 0)
+    else if ((IR & MEM_OPCODE) == MEM_OPCODE)
         memOpReg();
 
     // Branches/Jumps
-    else if (((IR & IR_branch_mask) >> 3) == 2)
+    else if ((IR & BRANCH_OPCODE) == BRANCH_OPCODE)
         branch();
 
     // check for HALT, NOP, or illegal opcodes last //
@@ -103,82 +104,53 @@ void executeInstruction(void) // Milan and Tabitha
 
 }
 
-void branch () //Milan and Tabitha
-{
-    switch(IR & IR_branch_type_mask)
-    {
-        case 0: // 0b000 - BRA
-            break;
-
-        case 1: // 0b001 - BRZ
-            if (ACC == 0 )
-            break;
-
-        case 2: // 0b010 - BNE
-            if (ACC != 0 )
-            break;
-
-        case 3: // 0b011 - BLT
-            if (ACC < 0 )
-            break;
-
-        case 4: // 0b100 - BLE
-            if (ACC <= 0 )
-            break;
- 
-        case 5: // 0b101 - BGT
-            if (ACC > 0 )
-            break;
-
-        case 6: // 0b110 - BGE
-            if (ACC >= 0)
-            break;
-
-        branch_func();
-    }
-
-
-}
-
-void branch_func()
-{
-
-}
-
 void mathOp()
 {
     unsigned int src = mathOpSrc();
     unsigned int dst = mathOpDst();
 
-    switch((IR & IR_math_func_mask)>> 4)
+    switch((IR & MATH_FUNC)>> 4)
     {
-        case 0:
-            dst = dst & src;
+        case 0: // 0b_000 - AND
+            dst &= src;
             break;
 
-        case 1:
-            dst = dst | src;
+        case 1: // 0b_001 - OR
+            dst |= src;
             break;
         
-        case 2:
-            dst = dst ^ src;
+        case 2: // 0b_010 - XOR
+            dst ^= src;
             break;
         
-        case 3:
-            dst = dst + src;
+        case 3: // 0b_011 - ADD
+            dst += src;
             break;
         
-        case 4:
-            dst = dst - src;
+        case 4: // 0b_100 - SUB
+            dst -= src;
+            break;
+        
+        case 5: // 0b_101 - INC
+            dst++;
+            break;
+        
+        case 6: // 0b_110 - DEC
+            dst--;
+            break;
+
+        case 7: // 0b_111 - NOT
+            dst = ~src;
+            break;
     }
 
     return dst;
 }
 
-unsigned int mathOpSrc() //Tabitha
+unsigned int mathOpSrc() // Milan
 {
     unsigned int src = 0;
-    switch ((IR & IR_2_lsb_mask))
+    switch ((IR & MATH_SRC))
     {
         case 0:
         //Indirect (MAR used as a pointer)
@@ -204,10 +176,10 @@ unsigned int mathOpSrc() //Tabitha
     return src;
 }
 
-unsigned int mathOpDst() //Tabitha
+unsigned int mathOpDst() // Milan
 {
     unsigned int dst = 0;
-    switch ((IR & IR_math_dst_mask)>>2)
+    switch ((IR & MATH_DST) >> 2)
     {
         case 0:
         //Indirect (MAR used as a pointer)
@@ -216,52 +188,134 @@ unsigned int mathOpDst() //Tabitha
         
         case 1:
         //Accumlator ACC
-
         break;
 
         case 2: 
         //Address register MAR
-        dst = MAR;
         break;
 
         case 3:
         //Memory
-        // dst = memory[];
         break;
     }
 
     return dst;
 }
 
-void memOpReg() //Tabitha
+
+
+void memOp()
 {
-     if ((IR & IR_mem_register_mask)== 0)
-     {
-        //Accumulator ACC
-     }
-     else 
-     {
-        //Index register MAR
-     }
-    memOpMeth();
+    unsigned int meth = memOpMeth();
+    unsigned int reg = memOpReg();
+
+    if( (IR & MEM_FUNC) >> 3) // 1 - LOAD
+    {
+
+    }
+
+    else // 0 - STOR
+    {
+
+    }
 }
 
-void memOpMeth()
+unsigned int memOpMeth()
 {
-    switch (IR & IR_2_lsb_mask)
+    unsigned int meth = 0;
+
+    switch (IR & MEM_METH)
     {
-        case 0: 
+        case 0: // 0b_000
         //Operand is used as address
+        
         break;
         
-        case 1:
+        case 1: // 0b_001
         //Operand is used as constant
+
         break;
 
-        case 2:
+        case 2: // 0b_010
         //Indirect(MAR used as pointer)
+
         break;
     }
 
+    return meth;
+}
+
+unsigned int memOpReg() // Tabitha
+{
+    unsigned int reg = 0;
+
+     if ((IR & MEM_REG) >> 2) // 1 - Index Register MAR
+     {
+        
+     }
+     else // 0 - Accumulator ACC
+     {
+
+     }
+    
+    return reg;
+}
+
+void branch () //Milan and Tabitha
+{
+    switch(IR & BRANCH_TYPE)
+    {
+        case 0: // 0b000 - BRA
+            break;
+
+        case 1: // 0b001 - BRZ
+            if (ACC == 0 )
+            {
+
+            }
+            break;
+
+        case 2: // 0b010 - BNE
+            if (ACC != 0 )
+            {
+
+            }
+            break;
+
+        case 3: // 0b011 - BLT
+            if (ACC < 0 )
+            {
+
+            }
+            break;
+
+        case 4: // 0b100 - BLE
+            if (ACC <= 0 )
+            {
+
+            }
+            break;
+ 
+        case 5: // 0b101 - BGT
+            if (ACC > 0 )
+            {
+
+            }
+            break;
+
+        case 6: // 0b110 - BGE
+            if (ACC >= 0)
+            {
+
+            }
+            break;
+    }
+    branch_func();
+
+
+}
+
+void branch_func()
+{
 
 }
