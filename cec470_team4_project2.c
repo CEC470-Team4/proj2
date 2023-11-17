@@ -10,9 +10,11 @@
 void fetchNextInstruction(void);
 void executeInstruction(void);
 void branch(void);
-void memOp(void);
 void memOpReg(void);
 void memOpMeth(void);
+void MathOpFunction(void);
+void MathOpDesination(void);
+void MathOpSource(void);
 
 unsigned char memory[65536];
 unsigned char ACC = 0;
@@ -26,6 +28,8 @@ unsigned int IR_mem_fuction_mask = 0b00001000;
 unsigned int IR_mem_register_mask = 0b00000100;
 unsigned int IR_2_LSB_mask = 0b00000011;
 unsigned int IR_MSB_mask = 0b10000000;
+unsigned int IR_Math_fuction_mask = 0b01110000;
+unsigned int IR_Math_desintation_mask = 0b00001100;
 
 
 
@@ -69,7 +73,14 @@ void executeInstruction(void) //Milan and Tabitha
     }
     else if (((IR & IR_method_mask) >> 3) == 0)
     {
-        memOp();
+        if ((IR & IR_mem_fuction_mask) == 0)
+        {
+            memOpReg;
+        }
+         else 
+        {
+            memOpReg;
+        }
     }
     else if (((IR & IR_MSB_mask)>> 7) == 1)
     {
@@ -130,17 +141,6 @@ void branch () //Milan and Tabitha
 
 }
 
-void memOp() //Tabitha
-{
-    if ((IR & IR_mem_fuction_mask) == 0)
-    {
-       memOpReg;
-    }
-    else 
-    {
-        memOpReg;
-    }
-}
 
 void memOpReg() //Tabitha
 {
