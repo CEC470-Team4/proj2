@@ -27,7 +27,6 @@ unsigned int IR_method_mask = 0b11110000; ///obtains the four MSBs of IR
 unsigned int IR_mem_fuction_mask = 0b00001000;
 unsigned int IR_mem_register_mask = 0b00000100;
 unsigned int IR_2_LSB_mask = 0b00000011;
-unsigned int IR_MSB_mask = 0b10000000;
 unsigned int IR_Math_fuction_mask = 0b01110000;
 unsigned int IR_Math_desintation_mask = 0b00001100;
 
@@ -66,10 +65,16 @@ void executeInstruction(void) //Milan and Tabitha
     else if (IR == NOP_OPCODE)
     {
         // GO TO NEXT INSTRUCTION
-        PC++;
+        fetchNextInstruction();
     }
 
     // checks for the rest
+
+    // Mathematical operations
+    else if ((IR >> 7))
+    {
+        MathOpDesination();
+    }
 
     else if (((IR & IR_branch_mask) >> 3) == 2)
     {
@@ -81,17 +86,13 @@ void executeInstruction(void) //Milan and Tabitha
         if ((IR & IR_mem_fuction_mask) == 0)
         {
             //Store
-            memOpReg;
         }
          else 
         {
             //Load
-            memOpReg;
-        }
-    }
-    else if (((IR & IR_MSB_mask)>> 7) == 1)
-    {
 
+        }
+        memOpReg;
     }
 }
 
@@ -148,82 +149,44 @@ void branch () //Milan and Tabitha
 
 }
 
-
-void memOpReg() //Tabitha
-{
-     if ((IR & IR_mem_register_mask)== 0){
-        //Accumulator ACC
-        memOpMeth();
-     }
-     else {
-        //Index register MAR
-        memOpMeth();
-     }
-}
-
-void memOpMeth()
-{
-    switch (IR & IR_2_LSB_mask)
-    {
-        case 0: 
-        //Operand is used as address
-        break;
-        
-        case 1:
-        //Operand is used as constant
-        break;
-
-        case 2:
-        //Indirect(MAR used as pointer)
-        break;
-    }
-
-
-}
-
 void MathOpFunction() //Tabitha
 {
     switch((IR & IR_Math_fuction_mask)>> 4)
     {
         case 0:
         //AND
-        MathOpDestination();
+
         break;
 
         case 1:
         //OR
-        MathOpDestination();
         break;
 
         case 2:
         //XOR
-        MathOpDestination();
         break; 
 
         case 3:
         //ADD
-        MathOpDestination();
         break;
 
         case 4:
         //SUB
-        MathOpDestination();
         break;
 
         case 5:
         //INC
-        MathOpDestination();
         break;
 
         case 6:
         //DEC
-        MathOpDestination();
         break;
 
         case 7:
         //NOT
-        MathOpDestination();
         break;
+
+        MathOpDestination();
     }
 }
 
@@ -233,24 +196,21 @@ void MathOpDestination() //Tabitha
     {
         case 0:
         //Indirect (MAR used as a pointer)
-        MathOpSource();
         break;
         
         case 1:
         //Accumlator ACC
-        MathOpSource();
         break;
 
         case 2: 
         //Address register MAR
-        MathOpSource();
         break;
 
         case 3:
         //Memory
-        MathOpSource();
         break;
 
+        MathOpSource();
     }
 }
 
@@ -274,5 +234,37 @@ void MathOpSource() //Tabitha
         //Memory
         break;
     }
+}
+
+void memOpReg() //Tabitha
+{
+     if ((IR & IR_mem_register_mask)== 0)
+     {
+        //Accumulator ACC
+     }
+     else 
+     {
+        //Index register MAR
+     }
+    memOpMeth();
+}
+
+void memOpMeth()
+{
+    switch (IR & IR_2_LSB_mask)
+    {
+        case 0: 
+        //Operand is used as address
+        break;
+        
+        case 1:
+        //Operand is used as constant
+        break;
+
+        case 2:
+        //Indirect(MAR used as pointer)
+        break;
+    }
+
 
 }
