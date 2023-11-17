@@ -11,6 +11,19 @@
 #define HALT_OPCODE 0x19
 #define NOP_OPCODE 0x18
 
+#define MATH_OPCODE 0x80
+#define MATH_FUNC 0x70
+#define MATH_SRC 0x03
+#define MATH_DST 0x0C
+
+#define MEM_OPCODE 0x00
+#define MEM_FUNC 0x08
+#define MEM_REG 0x04
+#define MEM_METH 0x03
+
+#define BRANCH_OPCODE 0x10
+#define BRANCH_TYPE 0x07
+
 void fetchNextInstruction(void);
 void executeInstruction(void);
 
@@ -29,24 +42,6 @@ unsigned char ACC = 0;
 unsigned char IR = 0;
 unsigned int MAR = 0;
 unsigned int PC = 0;
-
-// Math operations
-unsigned int IR_math_func_mask = 0b01110000;
-unsigned int IR_math_dst_mask = 0b00001100;
-
-// Memory operations
-unsigned int IR_mem_ops_mask = 0b11110000; ///obtains the four MSBs of IR
-unsigned int IR_mem_fuction_mask = 0b00001000;
-unsigned int IR_mem_register_mask = 0b00000100;
-
-// Branches/Jumps
-unsigned int IR_branch_mask = 0b11111000; // obtains the five MSBs of IR
-unsigned int IR_branch_type_mask = 0b00000111; // obtains the five MSBs of IR
-
-// General purpose
-unsigned int IR_2_lsb_mask = 0b00000011;
-
-
 
 int main(int argc, char * argv[])
 {
@@ -73,7 +68,7 @@ void executeInstruction(void) // Milan and Tabitha
     // check for regular opcodes first //
 
     // Mathematical operations
-    if ((IR >> 7))
+    if ((IR & MATH_OPCODE) == MATH_OPCODE)
         mathOp();
 
     // Memory operations
