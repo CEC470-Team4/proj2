@@ -71,45 +71,45 @@ void branch ()
 {
     switch(IR)
     {
-        case 0: // 000 - BRA
+        case 0: // 0b000 - BRA
             //Branch
             break;
 
-        case 1: // 001 - BRZ
+        case 1: // 0b001 - BRZ
             if (ACC == 0 ){
                 //Branch
             }
 
             break;
 
-        case 2: // 010 - BNE
+        case 2: // 0b010 - BNE
             if (ACC != 0 ){
                 //Branch
             }
 
             break;
 
-        case 3: // 011 - BLT
+        case 3: // 0b011 - BLT
             if (ACC < 0 ){
                 //Branch
             }
 
             break;
 
-        case 4: // 100 - BLE
+        case 4: // 0b100 - BLE
             if (ACC <= 0 ){
                 //Branch
             }
 
             break;
  
-        case 5: // 101 - BGT
+        case 5: // 0b101 - BGT
             if (ACC > 0 ){
                 //Branch
             }
             break;
 
-        case 6: // 110 - BGE
+        case 6: // 0b110 - BGE
             if (ACC >= 0 ){
                 //Branch
             }
