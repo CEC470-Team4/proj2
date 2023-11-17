@@ -9,13 +9,16 @@
 
 void fetchNextInstruction(void);
 void executeInstruction(void);
+
+void mathOp(void);
+unsigned int mathOpSrc(void);
+unsigned int mathOpDst(void);
+
 void branch(void);
-void branch_function(void);
+void branch_func(void);
+
 void memOpReg(void);
 void memOpMeth(void);
-void mathOpFunc(void);
-void MathOpDesination(void);
-void mathOpSrc(void);
 
 unsigned char memory[65536];
 unsigned char ACC = 0;
@@ -43,7 +46,7 @@ unsigned int IR_2_lsb_mask = 0b00000011;
 
 int main(int argc, char * argv[])
 {
-    // execution loop
+    // execution loop:
     // continue fetching and executing
     // until PC points to a HALT instrction
 
@@ -64,39 +67,34 @@ void fetchNextInstruction(void)
 
 void executeInstruction(void) //Milan and Tabitha
 {
-    // check for HALT or NOP opcodes first
-    if (IR == HALT_OPCODE)
-    {
-        // HALT
-        memory[PC] = HALT_OPCODE;
-    }
-    
-    else if (IR == NOP_OPCODE)
-    {
-        // GO TO NEXT INSTRUCTION
-        fetchNextInstruction();
-    }
-
-    // check for the rest
+    // check for regular opcodes first //
 
     // Mathematical operations
-    else if ((IR >> 7))
-    {
-        mathOpFunc();
-    }
+    if ((IR >> 7))
+        mathOp();
 
     // Memory operations
     else if (((IR & IR_mem_ops_mask) >> 3) == 0)
-    {
         memOpReg();
-    }
 
     // Branches/Jumps
     else if (((IR & IR_branch_mask) >> 3) == 2)
-    {
         branch();
-    }
 
+    // check for HALT or NOP last //
+    else 
+    switch(IR)
+    {
+        // HALT
+        case HALT_OPCODE:
+            memory[PC] = HALT_OPCODE;
+            break;
+
+        // NOP
+        case NOP_OPCODE:
+            fetchNextInstruction(); // GO TO NEXT INSTRUCTION
+            break;
+    }
 
 }
 
@@ -130,102 +128,104 @@ void branch () //Milan and Tabitha
         case 6: // 0b110 - BGE
             if (ACC >= 0)
             break;
-        branch_function;
 
+        branch_func();
     }
 
 
 }
 
-void branch_function()
+void branch_func()
 {
 
 }
 
-void mathOpFunc() //Tabitha
+void mathOp()
 {
+    unsigned int src = mathOpSrc();
+    unsigned int dst = mathOpDst();
+
     switch((IR & IR_math_func_mask)>> 4)
     {
-        case 0: // 
-        //AND
-        break;
-
-        case 1:
-        //OR
-        break;
-
-        case 2:
-        //XOR
-        break; 
-
-        case 3:
-        //ADD
-        break;
-
-        case 4:
-        //SUB
-        break;
-
-        case 5:
-        //INC
-        break;
-
-        case 6:
-        //DEC
-        break;
-
-        case 7:
-        //NOT
-        break;
-
-        mathOpDst();
-    }
-}
-
-void mathOpDst() //Tabitha
-{
-    switch ((IR & IR_math_dst_mask)>>2)
-    {
         case 0:
-        //Indirect (MAR used as a pointer)
-        break;
-        
+            dst = dst & src;
+            break;
+
         case 1:
-        //Accumlator ACC
-        break;
-
-        case 2: 
-        //Address register MAR
-        break;
-
+            dst = dst | src;
+            break;
+        
+        case 2:
+            dst = dst ^ src;
+            break;
+        
         case 3:
-        //Memory
-        break;
-
-        mathOpSrc();
+            dst = dst + src;
+            break;
+        
+        case 4:
+            dst = dst - src;
     }
+
+    return dst;
 }
 
-void mathOpSrc() //Tabitha
+unsigned int mathOpSrc() //Tabitha
 {
+    unsigned int src = 0;
     switch ((IR & IR_2_lsb_mask))
     {
         case 0:
         //Indirect (MAR used as a pointer)
+        src = memory[MAR];
         break;
 
         case 1:
         //Accumulator ACC
+        src = ACC;
         break;
 
         case 2: 
-        //Constant 
+        //Constant
+        // src = ?;
         break;
 
         case 3: 
         //Memory
+        // src = memory[];
         break;
     }
+
+    return src;
+}
+
+unsigned int mathOpDst() //Tabitha
+{
+    unsigned int dst = 0;
+    switch ((IR & IR_math_dst_mask)>>2)
+    {
+        case 0:
+        //Indirect (MAR used as a pointer)
+        dst = memory[MAR];
+        break;
+        
+        case 1:
+        //Accumlator ACC
+
+        break;
+
+        case 2: 
+        //Address register MAR
+        dst = MAR;
+        break;
+
+        case 3:
+        //Memory
+        // dst = memory[];
+        break;
+    }
+
+    return dst;
 }
 
 void memOpReg() //Tabitha
