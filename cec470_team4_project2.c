@@ -80,10 +80,12 @@ void executeInstruction(void) //Milan and Tabitha
     {
         if ((IR & IR_mem_fuction_mask) == 0)
         {
+            //Store
             memOpReg;
         }
          else 
         {
+            //Load
             memOpReg;
         }
     }
@@ -150,9 +152,11 @@ void branch () //Milan and Tabitha
 void memOpReg() //Tabitha
 {
      if ((IR & IR_mem_register_mask)== 0){
+        //Accumulator ACC
         memOpMeth();
      }
      else {
+        //Index register MAR
         memOpMeth();
      }
 }
@@ -174,5 +178,101 @@ void memOpMeth()
         break;
     }
 
+
+}
+
+void MathOpFunction() //Tabitha
+{
+    switch((IR & IR_Math_fuction_mask)>> 4)
+    {
+        case 0:
+        //AND
+        MathOpDestination();
+        break;
+
+        case 1:
+        //OR
+        MathOpDestination();
+        break;
+
+        case 2:
+        //XOR
+        MathOpDestination();
+        break; 
+
+        case 3:
+        //ADD
+        MathOpDestination();
+        break;
+
+        case 4:
+        //SUB
+        MathOpDestination();
+        break;
+
+        case 5:
+        //INC
+        MathOpDestination();
+        break;
+
+        case 6:
+        //DEC
+        MathOpDestination();
+        break;
+
+        case 7:
+        //NOT
+        MathOpDestination();
+        break;
+    }
+}
+
+void MathOpDestination() //Tabitha
+{
+    switch ((IR & IR_Math_desintation_mask)>>2)
+    {
+        case 0:
+        //Indirect (MAR used as a pointer)
+        MathOpSource();
+        break;
+        
+        case 1:
+        //Accumlator ACC
+        MathOpSource();
+        break;
+
+        case 2: 
+        //Address register MAR
+        MathOpSource();
+        break;
+
+        case 3:
+        //Memory
+        MathOpSource();
+        break;
+
+    }
+}
+
+void MathOpSource() //Tabitha
+{
+    switch ((IR & IR_2_LSB_mask))
+    {
+        case 0:
+        //Indirect (MAR used as a pointer)
+        break;
+
+        case 1:
+        //Accumulator ACC
+        break;
+
+        case 2: 
+        //Constant 
+        break;
+
+        case 3: 
+        //Memory
+        break;
+    }
 
 }
