@@ -61,8 +61,7 @@ int main(int argc, char * argv[])
 
 void fetchNextInstruction(void)
 {
-
-    PC += 1; // increment PC by blah blah blah
+    
 }
 
 void executeInstruction(void) //Milan and Tabitha
