@@ -1,7 +1,5 @@
 // Authors: Milan Haruyama, Maegan Lucas, Tabitha O'Malley
 // Professor: Dr. Laxima Niure Kandel
-// 
-
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -12,7 +10,7 @@
 void fetchNextInstruction(void);
 void executeInstruction(void);
 void branch(void);
-void method(void);
+void memOp(void);
 
 unsigned char memory[65536];
 unsigned char ACC = 0;
@@ -64,7 +62,7 @@ void executeInstruction(void)
     }
     else if (((IR & IR_methodmask) >> 3) == 0)
     {
-        method();
+        memOp();
     }
     
 }
@@ -121,7 +119,8 @@ void branch ()
 
 
 }
-void method()
+
+void memOp()
 {
     
 }
