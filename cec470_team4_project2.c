@@ -1,5 +1,9 @@
-// Authors: Milan Haruyama, Maegan Lucas, Tabitha O'Malley
+// Authors: Milan Haruyama, Maegan Lucas, Tabitha O'Malley (Team 4)
 // Professor: Dr. Laxima Niure Kandel
+// Course: CEC 470
+// Overview: Two-stage instruction decoder written in C.
+//           Fetching written by Maegan Lucas.
+//           Execution written by Milan Haruyama and Tabitha O'Malley.
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -61,10 +65,10 @@ int main(int argc, char * argv[])
 
 void fetchNextInstruction(void)
 {
-    
+
 }
 
-void executeInstruction(void) //Milan and Tabitha
+void executeInstruction(void) // Milan and Tabitha
 {
     // check for regular opcodes first //
 
