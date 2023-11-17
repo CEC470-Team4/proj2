@@ -84,18 +84,25 @@ void executeInstruction(void) // Milan and Tabitha
     else if (((IR & IR_branch_mask) >> 3) == 2)
         branch();
 
-    // check for HALT or NOP last //
+    // check for HALT, NOP, or illegal opcodes last //
     else 
     switch(IR)
     {
         // HALT
         case HALT_OPCODE:
-            memory[PC] = HALT_OPCODE;
+            // halts program
+            memory[PC] = HALT_OPCODE; 
             break;
 
         // NOP
         case NOP_OPCODE:
-            fetchNextInstruction(); // GO TO NEXT INSTRUCTION
+            // literally does nothing lol
+            break;
+
+        // illegal opcode (default)
+        default:
+            // prints an error message
+            printf("Error: Illegal opcode!\n"); 
             break;
     }
 
