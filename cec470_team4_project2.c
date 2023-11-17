@@ -20,11 +20,11 @@ unsigned char IR = 0;
 unsigned int MAR = 0;
 unsigned int PC = 0;
 
-unsigned int IR_branchmask = 0b11111000; // obtains the five MSBs of IR
-unsigned int IR_methodmask = 0b11110000; ///obtains the four MSBs of IR
-unsigned int IR_memfuctionmask = 0b00001000;
-unsigned int IR_memregistermask = 0b00000100;
-unsigned int IR_memmethodmask = 0b00000011;
+unsigned int IR_branch_mask = 0b11111000; // obtains the five MSBs of IR
+unsigned int IR_method_mask = 0b11110000; ///obtains the four MSBs of IR
+unsigned int IR_mem_fuction_mask = 0b00001000;
+unsigned int IR_mem_register_mask = 0b00000100;
+unsigned int IR_mem_method_mask = 0b00000011;
 
 
 
@@ -62,11 +62,11 @@ void executeInstruction(void) //Milan and Tabitha
         // DO NOTHING
         
     }
-    else if (((IR & IR_branchmask) >> 3) == 2)
+    else if (((IR & IR_branch_mask) >> 3) == 2)
     {
         branch();
     }
-    else if (((IR & IR_methodmask) >> 3) == 0)
+    else if (((IR & IR_method_mask) >> 3) == 0)
     {
         memOp();
     }
@@ -128,7 +128,7 @@ void branch () //Milan and Tabitha
 
 void memOp() //Tabitha
 {
-    if ((IR & IR_memfuctionmask) == 0)
+    if ((IR & IR_mem_fuction_mask) == 0)
     {
        memOpReg;
     }
@@ -140,7 +140,7 @@ void memOp() //Tabitha
 
 void memOpReg() //Tabitha
 {
-     if ((IR & IR_memregistermask)== 0){
+     if ((IR & IR_mem_register_mask)== 0){
         memOpMeth();
      }
      else {
@@ -150,7 +150,7 @@ void memOpReg() //Tabitha
 
 void memOpMeth()
 {
-    switch (IR & IR_memmethodmask)
+    switch (IR & IR_mem_method_mask)
     {
         case 0: 
         //Operand is used as address
