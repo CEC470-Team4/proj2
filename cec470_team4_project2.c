@@ -56,21 +56,26 @@ void fetchNextInstruction(void)
 
 void executeInstruction(void) //Milan and Tabitha
 {
+    // checks for HALT or NOP opcodes first
     if (IR == HALT_OPCODE)
     {
         // HALT
+        memory[PC] = HALT_OPCODE;
     }
     
     else if (IR == NOP_OPCODE)
     {
-
-        // DO NOTHING
-        
+        // GO TO NEXT INSTRUCTION
+        PC++;
     }
+
+    // checks for the rest
+
     else if (((IR & IR_branch_mask) >> 3) == 2)
     {
         branch();
     }
+
     else if (((IR & IR_method_mask) >> 3) == 0)
     {
         if ((IR & IR_mem_fuction_mask) == 0)
