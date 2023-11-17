@@ -23,15 +23,20 @@ unsigned char IR = 0;
 unsigned int MAR = 0;
 unsigned int PC = 0;
 
-unsigned int IR_branch_mask = 0b11111000; // obtains the five MSBs of IR
-unsigned int IR_branch_type_mask = 0b00000111; // obtains the five MSBs of IR
+// Math operations
+unsigned int IR_math_func_mask = 0b01110000;
+unsigned int IR_math_dst_mask = 0b00001100;
+
+// Memory operations
 unsigned int IR_mem_ops_mask = 0b11110000; ///obtains the four MSBs of IR
 unsigned int IR_mem_fuction_mask = 0b00001000;
 unsigned int IR_mem_register_mask = 0b00000100;
 
-unsigned int IR_math_func_mask = 0b01110000;
-unsigned int IR_math_dst_mask = 0b00001100;
+// Branches/Jumps
+unsigned int IR_branch_mask = 0b11111000; // obtains the five MSBs of IR
+unsigned int IR_branch_type_mask = 0b00000111; // obtains the five MSBs of IR
 
+// General purpose
 unsigned int IR_2_lsb_mask = 0b00000011;
 
 
@@ -80,13 +85,13 @@ void executeInstruction(void) //Milan and Tabitha
         mathOpFunc();
     }
 
-    // Memory Operations
+    // Memory operations
     else if (((IR & IR_mem_ops_mask) >> 3) == 0)
     {
         memOpReg();
     }
 
-    // Branches/Jumps:
+    // Branches/Jumps
     else if (((IR & IR_branch_mask) >> 3) == 2)
     {
         branch();
