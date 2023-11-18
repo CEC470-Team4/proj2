@@ -11,7 +11,6 @@
 #define HALT_OPCODE 0x19
 #define NOP_OPCODE 0x18
 
-<<<<<<< Updated upstream
 #define MATH_OPCODE 0x80
 #define MATH_FUNC 0x70
 #define MATH_SRC 0x03
@@ -24,17 +23,6 @@
 
 #define BRANCH_OPCODE 0x10
 #define BRANCH_TYPE 0x07
-=======
-void fetchNextInstruction(void);
-void executeInstruction(void);
-void branch(void);
-void branch_function(void);
-void memOpReg(void);
-void memOpMeth(void);
-void MathOpFunction(void);
-void MathOpDesination(void);
-void MathOpSource(void);
->>>>>>> Stashed changes
 
 unsigned char memory[65536];
 unsigned char ACC = 0;
@@ -151,51 +139,9 @@ void mathOp()
             dst--;
             break;
 
-<<<<<<< Updated upstream
         case 7: // 0b_111 - NOT
             dst = ~src;
-=======
-        case 1: // 0b001 - BRZ
-            if (ACC == 0 ){
-                //Branch
-            }
-
             break;
-
-        case 2: // 0b010 - BNE
-            if (ACC != 0 ){
-                //Branch
-            }
-
-            break;
-
-        case 3: // 0b011 - BLT
-            if (ACC < 0 ){
-                //Branch
-            }
-
-            break;
-
-        case 4: // 0b100 - BLE
-            if (ACC <= 0 ){
-                //Branch
-            }
-
-            break;
- 
-        case 5: // 0b101 - BGT
-            if (ACC > 0 ){
-                //Branch
-            }
-            break;
-
-        case 6: // 0b110 - BGE
-            if (ACC >= 0 ){
-                //Branch
-            }
->>>>>>> Stashed changes
-            break;
-        branch_function();
     }
 
     return dst;
