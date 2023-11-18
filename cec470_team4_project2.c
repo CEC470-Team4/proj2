@@ -329,8 +329,6 @@ void branch () //Milan and Tabitha
         case 6: // 0b110 - BGE
             if (ACC >= 0) brch = true;
             break;
-
-        
     }
 
     //Branch    
