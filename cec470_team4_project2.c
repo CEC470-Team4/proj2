@@ -7,6 +7,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #define HALT_OPCODE 0x19
 #define NOP_OPCODE 0x18
@@ -42,7 +43,7 @@ unsigned int mathOpSrc(void);
 unsigned int * mathOpDst(void);
 
 void memOp(void);
-unsigned int memOpReg(void);
+bool memOpReg(void);
 unsigned int memOpMeth(void);
 
 void branch(void);
@@ -173,8 +174,6 @@ void mathOp()
             *dst = ~(*dst);
             break;
     }
-
-    // return dst;
 }
 
 unsigned int mathOpSrc() // Milan
@@ -194,7 +193,7 @@ unsigned int mathOpSrc() // Milan
 
         case 2: 
         //Constant
-        // src = ?;
+        
         break;
 
         case 3: 
@@ -229,7 +228,7 @@ unsigned int * mathOpDst() // Milan
 
         case 3:
         //Memory
-        dst = (unsigned int *)&memory[address()];
+        dst = (unsigned int *) &memory[address()];
         break;
     }
 
@@ -287,7 +286,7 @@ unsigned int memOpMeth()
     return opAddress;
 }
 
-unsigned int memOpReg() // Tabitha & Milan
+bool memOpReg() // Tabitha & Milan
 {
     //returns a 1 or 0 depending on which register is used
     // 0 - Accumulator ACC
@@ -345,12 +344,5 @@ void branch () //Milan and Tabitha
             }
             break;
     }
-    branch_func();
-
-
-}
-
-void branch_func()
-{
 
 }
