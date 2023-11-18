@@ -1,5 +1,9 @@
-// Authors: Milan Haruyama, Maegan Lucas, Tabitha O'Malley
+// Authors: Milan Haruyama, Maegan Lucas, Tabitha O'Malley (Team 4)
 // Professor: Dr. Laxima Niure Kandel
+// Course: CEC 470
+// Overview: Two-stage instruction decoder written in C.
+//           Fetching written by Maegan Lucas.
+//           Execution written by Milan Haruyama and Tabitha O'Malley.
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -7,15 +11,18 @@
 #define HALT_OPCODE 0x19
 #define NOP_OPCODE 0x18
 
-void fetchNextInstruction(void);
-void executeInstruction(void);
-void branch(void);
-void branch_function(void);
-void memOpReg(void);
-void memOpMeth(void);
-void mathOpFunc(void);
-void MathOpDesination(void);
-void mathOpSrc(void);
+#define MATH_OPCODE 0x80
+#define MATH_FUNC 0x70
+#define MATH_SRC 0x03
+#define MATH_DST 0x0C
+
+#define MEM_OPCODE 0x00
+#define MEM_FUNC 0x08
+#define MEM_REG 0x04
+#define MEM_METH 0x03
+
+#define BRANCH_OPCODE 0x10
+#define BRANCH_TYPE 0x07
 
 unsigned char memory[65536];
 unsigned char ACC = 0;
@@ -23,27 +30,23 @@ unsigned char IR = 0;
 unsigned int MAR = 0;
 unsigned int PC = 0;
 
-// Math operations
-unsigned int IR_math_func_mask = 0b01110000;
-unsigned int IR_math_dst_mask = 0b00001100;
+void fetchNextInstruction(void);
+void executeInstruction(void);
 
-// Memory operations
-unsigned int IR_mem_ops_mask = 0b11110000; ///obtains the four MSBs of IR
-unsigned int IR_mem_fuction_mask = 0b00001000;
-unsigned int IR_mem_register_mask = 0b00000100;
+void mathOp(void);
+unsigned int mathOpSrc(void);
+unsigned int mathOpDst(void);
 
-// Branches/Jumps
-unsigned int IR_branch_mask = 0b11111000; // obtains the five MSBs of IR
-unsigned int IR_branch_type_mask = 0b00000111; // obtains the five MSBs of IR
+void memOp(void);
+unsigned int memOpReg(void);
+unsigned int memOpMeth(void);
 
-// General purpose
-unsigned int IR_2_lsb_mask = 0b00000011;
-
-
+void branch(void);
+void branch_func(void);
 
 int main(int argc, char * argv[])
 {
-    // execution loop
+    // execution loop:
     // continue fetching and executing
     // until PC points to a HALT instrction
 
@@ -59,137 +62,128 @@ int main(int argc, char * argv[])
 void fetchNextInstruction(void)
 {
 
-    PC += 1; // increment PC by blah blah blah
 }
 
-void executeInstruction(void) //Milan and Tabitha
+void executeInstruction(void) // Milan and Tabitha
 {
-    // check for HALT or NOP opcodes first
-    if (IR == HALT_OPCODE)
-    {
-        // HALT
-        memory[PC] = HALT_OPCODE;
-    }
-    
-    else if (IR == NOP_OPCODE)
-    {
-        // GO TO NEXT INSTRUCTION
-        fetchNextInstruction();
-    }
-
-    // check for the rest
+    // check for regular opcodes first //
 
     // Mathematical operations
-    else if ((IR >> 7))
-    {
-        mathOpFunc();
-    }
+    if ((IR & MATH_OPCODE) == MATH_OPCODE)
+        mathOp();
 
     // Memory operations
-    else if (((IR & IR_mem_ops_mask) >> 3) == 0)
-    {
+    else if ((IR & MEM_OPCODE) == MEM_OPCODE)
         memOpReg();
-    }
 
     // Branches/Jumps
-    else if (((IR & IR_branch_mask) >> 3) == 2)
-    {
+    else if ((IR & BRANCH_OPCODE) == BRANCH_OPCODE)
         branch();
-    }
 
-
-}
-
-void branch () //Milan and Tabitha
-{
-    switch(IR & IR_branch_type_mask)
+    // check for HALT, NOP, or illegal opcodes last //
+    else 
+    switch(IR)
     {
-        case 0: // 0b000 - BRA
+        // HALT
+        case HALT_OPCODE:
+            // halts program
+            memory[PC] = HALT_OPCODE; 
             break;
 
-        case 1: // 0b001 - BRZ
-            if (ACC == 0 )
+        // NOP
+        case NOP_OPCODE:
+            // literally does nothing lol
             break;
 
-        case 2: // 0b010 - BNE
-            if (ACC != 0 )
+        // illegal opcode (default)
+        default:
+            // prints an error message
+            printf("Error: Illegal opcode!\n"); 
             break;
-
-        case 3: // 0b011 - BLT
-            if (ACC < 0 )
-            break;
-
-        case 4: // 0b100 - BLE
-            if (ACC <= 0 )
-            break;
- 
-        case 5: // 0b101 - BGT
-            if (ACC > 0 )
-            break;
-
-        case 6: // 0b110 - BGE
-            if (ACC >= 0)
-            break;
-        branch_function;
-
     }
 
-
 }
 
-void branch_function()
+void mathOp()
 {
-    //Branch
-    // Loop
-    // PC< PC - instruction length
-}
+    unsigned int src = mathOpSrc();
+    unsigned int dst = mathOpDst();
 
-void mathOpFunc() //Tabitha
-{
-    switch((IR & IR_math_func_mask)>> 4)
+    switch((IR & MATH_FUNC)>> 4)
     {
-        case 0: // 
-        //AND
-        break;
+        case 0: // 0b_000 - AND
+            dst &= src;
+            break;
 
-        case 1:
-        //OR
-        break;
+        case 1: // 0b_001 - OR
+            dst |= src;
+            break;
+        
+        case 2: // 0b_010 - XOR
+            dst ^= src;
+            break;
+        
+        case 3: // 0b_011 - ADD
+            dst += src;
+            break;
+        
+        case 4: // 0b_100 - SUB
+            dst -= src;
+            break;
+        
+        case 5: // 0b_101 - INC
+            dst++;
+            break;
+        
+        case 6: // 0b_110 - DEC
+            dst--;
+            break;
 
-        case 2:
-        //XOR
-        break; 
-
-        case 3:
-        //ADD
-        break;
-
-        case 4:
-        //SUB
-        break;
-
-        case 5:
-        //INC
-        break;
-
-        case 6:
-        //DEC
-        break;
-
-        case 7:
-        //NOT
-        break;
-
-        mathOpDst();
+        case 7: // 0b_111 - NOT
+            dst = ~src;
+            break;
     }
+
+    return dst;
 }
 
-void mathOpDst() //Tabitha
+unsigned int mathOpSrc() // Milan
 {
-    switch ((IR & IR_math_dst_mask)>>2)
+    unsigned int src = 0;
+    switch ((IR & MATH_SRC))
     {
         case 0:
         //Indirect (MAR used as a pointer)
+        src = memory[MAR];
+        break;
+
+        case 1:
+        //Accumulator ACC
+        src = ACC;
+        break;
+
+        case 2: 
+        //Constant
+        // src = ?;
+        break;
+
+        case 3: 
+        //Memory
+        // src = memory[];
+        break;
+    }
+
+    return src;
+}
+
+unsigned int mathOpDst() // Milan
+{
+    unsigned int dst = 0;
+    switch ((IR & MATH_DST) >> 2)
+    {
+        case 0:
+        //Indirect (MAR used as a pointer)
+        dst = memory[MAR];
         break;
         
         case 1:
@@ -203,62 +197,125 @@ void mathOpDst() //Tabitha
         case 3:
         //Memory
         break;
+    }
 
-        mathOpSrc();
+    return dst;
+}
+
+
+
+void memOp()
+{
+    unsigned int meth = memOpMeth();
+    unsigned int reg = memOpReg();
+
+    if( (IR & MEM_FUNC) >> 3) // 1 - LOAD
+    {
+
+    }
+
+    else // 0 - STOR
+    {
+
     }
 }
 
-void mathOpSrc() //Tabitha
+unsigned int memOpMeth()
 {
-    switch ((IR & IR_2_lsb_mask))
+    unsigned int meth = 0;
+
+    switch (IR & MEM_METH)
     {
-        case 0:
-        //Indirect (MAR used as a pointer)
-        break;
-
-        case 1:
-        //Accumulator ACC
-        break;
-
-        case 2: 
-        //Constant 
-        break;
-
-        case 3: 
-        //Memory
-        break;
-    }
-}
-
-void memOpReg() //Tabitha
-{
-     if ((IR & IR_mem_register_mask)== 0)
-     {
-        //Accumulator ACC
-     }
-     else 
-     {
-        //Index register MAR
-     }
-    memOpMeth();
-}
-
-void memOpMeth()
-{
-    switch (IR & IR_2_lsb_mask)
-    {
-        case 0: 
+        case 0: // 0b_000
         //Operand is used as address
+        
         break;
         
-        case 1:
+        case 1: // 0b_001
         //Operand is used as constant
+
         break;
 
-        case 2:
+        case 2: // 0b_010
         //Indirect(MAR used as pointer)
+
         break;
     }
 
+    return meth;
+}
+
+unsigned int memOpReg() // Tabitha
+{
+    unsigned int reg = 0;
+
+     if ((IR & MEM_REG) >> 2) // 1 - Index Register MAR
+     {
+        
+     }
+     else // 0 - Accumulator ACC
+     {
+
+     }
+    
+    return reg;
+}
+
+void branch () //Milan and Tabitha
+{
+    switch(IR & BRANCH_TYPE)
+    {
+        case 0: // 0b000 - BRA
+            break;
+
+        case 1: // 0b001 - BRZ
+            if (ACC == 0 )
+            {
+
+            }
+            break;
+
+        case 2: // 0b010 - BNE
+            if (ACC != 0 )
+            {
+
+            }
+            break;
+
+        case 3: // 0b011 - BLT
+            if (ACC < 0 )
+            {
+
+            }
+            break;
+
+        case 4: // 0b100 - BLE
+            if (ACC <= 0 )
+            {
+
+            }
+            break;
+ 
+        case 5: // 0b101 - BGT
+            if (ACC > 0 )
+            {
+
+            }
+            break;
+
+        case 6: // 0b110 - BGE
+            if (ACC >= 0)
+            {
+
+            }
+            break;
+    }
+    branch_func();
+
+
+}
+
+void branch_func()
+{
 
 }
