@@ -37,7 +37,7 @@ void executeInstruction(void);
 
 void mathOp(void);
 unsigned int mathOpSrc(void);
-unsigned int mathOpDst(void);
+unsigned int * mathOpDst(void);
 
 void memOp(void);
 unsigned int memOpReg(void);
@@ -108,7 +108,7 @@ void executeInstruction(void) // Milan and Tabitha
         // HALT
         case HALT_OPCODE:
             // halts program
-            memory[PC] = HALT_OPCODE; 
+            printf("Stopping!\n"); 
             break;
 
         // NOP
@@ -128,40 +128,40 @@ void executeInstruction(void) // Milan and Tabitha
 void mathOp()
 {
     unsigned int src = mathOpSrc();
-    unsigned int dst = mathOpDst();
+    unsigned int * dst = mathOpDst();
 
     switch((IR & MATH_FUNC)>> 4)
     {
         case 0: // 0b_000 - AND
-            dst &= src;
+            *dst &= src;
             break;
 
         case 1: // 0b_001 - OR
-            dst |= src;
+            *dst |= src;
             break;
         
         case 2: // 0b_010 - XOR
-            dst ^= src;
+            *dst ^= src;
             break;
         
         case 3: // 0b_011 - ADD
-            dst += src;
+            *dst += src;
             break;
         
         case 4: // 0b_100 - SUB
-            dst -= src;
+            *dst -= src;
             break;
         
         case 5: // 0b_101 - INC
-            dst++;
+            (*dst)++;
             break;
         
         case 6: // 0b_110 - DEC
-            dst--;
+            (*dst)--;
             break;
 
         case 7: // 0b_111 - NOT
-            dst = ~src;
+            *dst = ~(*dst);
             break;
     }
 
@@ -197,26 +197,30 @@ unsigned int mathOpSrc() // Milan
     return src;
 }
 
-unsigned int mathOpDst() // Milan
+unsigned int * mathOpDst() // Milan
 {
-    unsigned int dst = 0;
+    // returns the memory address of the destination
+    unsigned int *dst = NULL;
     switch ((IR & MATH_DST) >> 2)
     {
         case 0:
         //Indirect (MAR used as a pointer)
-        dst = memory[MAR];
+        dst = (unsigned int *) &memory[MAR];
         break;
         
         case 1:
         //Accumlator ACC
+        dst = (unsigned int *) &ACC;
         break;
 
         case 2: 
         //Address register MAR
+        dst = &MAR;
         break;
 
         case 3:
         //Memory
+        dst = (unsigned int *)&memory[];
         break;
     }
 
