@@ -174,6 +174,7 @@ void mathOp()
             *dst = ~(*dst);
             break;
     }
+
 }
 
 unsigned int mathOpSrc() // Milan
@@ -297,52 +298,43 @@ bool memOpReg() // Tabitha & Milan
 
 void branch () //Milan and Tabitha
 {
+    bool brch = false;
+
     switch(IR & BRANCH_TYPE)
     {
         case 0: // 0b000 - BRA
+            brch = true;
             break;
 
         case 1: // 0b001 - BRZ
-            if (ACC == 0 )
-            {
-
-            }
+            if (ACC == 0 ) brch = true;
             break;
 
         case 2: // 0b010 - BNE
-            if (ACC != 0 )
-            {
-
-            }
+            if (ACC != 0 ) brch = true;
             break;
 
         case 3: // 0b011 - BLT
-            if (ACC < 0 )
-            {
-
-            }
-            break;
+            if (ACC < 0 ) brch = true;
+             break;
 
         case 4: // 0b100 - BLE
-            if (ACC <= 0 )
-            {
-
-            }
+            if (ACC <= 0 )brch = true;
             break;
  
         case 5: // 0b101 - BGT
-            if (ACC > 0 )
-            {
-
-            }
+            if (ACC > 0 ) brch = true;
             break;
 
         case 6: // 0b110 - BGE
-            if (ACC >= 0)
-            {
-
-            }
+            if (ACC >= 0) brch = true;
             break;
+
+        
     }
 
+    //Branch    
+    if (brch)
+        PC = address();    
+    
 }
