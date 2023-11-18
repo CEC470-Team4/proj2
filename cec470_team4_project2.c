@@ -35,6 +35,8 @@ unsigned int PC = 0x0000;
 void fetchNextInstruction(void);
 void executeInstruction(void);
 
+unsigned int address(void);
+
 void mathOp(void);
 unsigned int mathOpSrc(void);
 unsigned int * mathOpDst(void);
@@ -125,12 +127,19 @@ void executeInstruction(void) // Milan and Tabitha
 
 }
 
+unsigned int address()
+{
+    // retrieves the two byte address proceeding the opcode
+    // also converts the address from big-endian to little-endian
+    return (memory[PC - 2] << 8) + memory[PC - 1];
+}
+
 void mathOp()
 {
     unsigned int src = mathOpSrc();
     unsigned int * dst = mathOpDst();
 
-    switch((IR & MATH_FUNC)>> 4)
+    switch((IR & MATH_FUNC) >> 4)
     {
         case 0: // 0b_000 - AND
             *dst &= src;
@@ -220,7 +229,7 @@ unsigned int * mathOpDst() // Milan
 
         case 3:
         //Memory
-        dst = (unsigned int *)&memory[];
+        dst = (unsigned int *)&memory[address()];
         break;
     }
 
@@ -247,17 +256,25 @@ void memOp()
 
 unsigned int memOpMeth()
 {
-    unsigned int meth = 0;
+    unsigned int opAddress = 0;
 
     switch (IR & MEM_METH)
     {
         case 0: // 0b_000
         //Operand is used as address
-        
+        opAddress = address();        
         break;
         
         case 1: // 0b_001
         //Operand is used as constant
+        if(memOpReg)
+        {
+
+        }
+        else
+        {
+
+        }
 
         break;
 
@@ -267,23 +284,16 @@ unsigned int memOpMeth()
         break;
     }
 
-    return meth;
+    return opAddress;
 }
 
-unsigned int memOpReg() // Tabitha
+unsigned int memOpReg() // Tabitha & Milan
 {
-    unsigned int reg = 0;
+    //returns a 1 or 0 depending on which register is used
+    // 0 - Accumulator ACC
+    // 1 - Index Register MAR
 
-     if ((IR & MEM_REG) >> 2) // 1 - Index Register MAR
-     {
-        
-     }
-     else // 0 - Accumulator ACC
-     {
-
-     }
-    
-    return reg;
+     return ((IR & MEM_REG) >> 2);
 }
 
 void branch () //Milan and Tabitha
