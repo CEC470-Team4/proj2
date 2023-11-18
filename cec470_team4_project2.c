@@ -24,11 +24,13 @@
 #define BRANCH_OPCODE 0x10
 #define BRANCH_TYPE 0x07
 
+FILE *fileptr;
+
 unsigned char memory[65536];
-unsigned char ACC = 0;
-unsigned char IR = 0;
-unsigned int MAR = 0;
-unsigned int PC = 0;
+unsigned char ACC = 0x00;
+unsigned char IR = 0x00;
+unsigned int MAR = 0x0000;
+unsigned int PC = 0x0000;
 
 void fetchNextInstruction(void);
 void executeInstruction(void);
@@ -46,6 +48,9 @@ void branch_func(void);
 
 int main(int argc, char * argv[])
 {
+    // read memory from file and save to memory array
+    readMemory();
+
     // execution loop:
     // continue fetching and executing
     // until PC points to a HALT instrction
@@ -59,8 +64,24 @@ int main(int argc, char * argv[])
     return 0;
 }
 
-void fetchNextInstruction(void)
+void readMemory(void) // Maegan
 {
+    fileptr = fopen("mem_in.txt", "r");
+    int i = 0;
+    unsigned char c1, c2;
+    while(!feof(fileptr))
+    {
+        fscanf(fileptr, "%d", &memory[i]);
+        printf("%d\n", memory[i]);
+        i++;
+    }
+
+    fclose(fileptr);
+}
+
+void fetchNextInstruction(void) // Maegan
+{
+
 
 }
 
