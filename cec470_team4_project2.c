@@ -144,7 +144,7 @@ void mathOp()
             break;
     }
 
-    return dst;
+    // return dst;
 }
 
 unsigned int mathOpSrc() // Milan
