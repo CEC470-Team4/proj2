@@ -139,7 +139,9 @@ void branch () //Milan and Tabitha
 
 void branch_function()
 {
-
+    //Branch
+    // Loop
+    // PC< PC - instruction length
 }
 
 void mathOpFunc() //Tabitha
