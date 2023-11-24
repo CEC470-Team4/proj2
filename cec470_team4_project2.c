@@ -183,24 +183,28 @@ unsigned int mathOpSrc() // Milan
     switch ((IR & MATH_SRC))
     {
         case 0:
-        //Indirect (MAR used as a pointer)
-        src = memory[MAR];
-        break;
+            //Indirect (MAR used as a pointer)
+            src = memory[MAR];
+            break;
 
         case 1:
-        //Accumulator ACC
-        src = ACC;
-        break;
+            //Accumulator ACC
+            src = ACC;
+            break;
 
         case 2: 
-        //Constant
+            //Constant
+            if(0x08)
+                src = address();
+            else
+                src = memory[PC - 1];
         
-        break;
+            break;
 
         case 3: 
-        //Memory
-        // src = memory[];
-        break;
+            //Memory
+            src = memory[address()];
+            break;
     }
 
     return src;
