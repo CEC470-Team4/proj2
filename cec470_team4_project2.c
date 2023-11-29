@@ -33,11 +33,10 @@
 FILE *fileptr;
 
 unsigned char memory[65536];
-unsigned char ACC = 0x00;
-unsigned char IR = 0x00;
-unsigned int MAR = 0x0000;
-unsigned int PC = 0x0000;
-unsigned int bytes = 0;
+unsigned char ACC = 0;
+unsigned char IR = 0;
+unsigned int MAR = 0;
+unsigned int PC = 0;
 
 void readMemory(void);
 
@@ -103,31 +102,39 @@ void readMemory(void) // Maegan
 
 void fetchNextInstruction(void) // Maegan
 {
-    bytes = 0;
+    int bytes = 0;
     IR = memory[PC];
     if((IR & MATH_OPCODE) == MATH_OPCODE) {
-        if ((IR & MATH_DST >> 2) == 0) {
-            bytes = bytes + 2;
-        } else if ((IR & MATH_DST >> 2) == 1) {
-            bytes = bytes + 1;
+        if ((IR & MATH_FUNC) >> 4) {
+            if ((IR & MATH_DST) == MATH_DST) {
+                bytes += 2;
+            } else {
+                bytes += 1;
+            }
+        } else if (((IR & MATH_DST) != MATH_DST) && (IR & MATH_DST) >> 2 == 0) {
+            bytes += 1;
+        } else if ((IR & MATH_DST) >> 2 == 2) {
+            bytes += 2;
+        } else {
+            bytes += 3;
         }
     } else if ((IR & MEM_OPCODE) == MEM_OPCODE) {
         if ((IR & MEM_METH) == 1) {
             if ((IR & MEM_REG) >> 2) {
-                bytes = bytes + 2;
+                bytes += 2;
             } else {
-                bytes = bytes + 1;
+                bytes += 1;
             }
         } else {
-            bytes = bytes + 2;
+            bytes += 3;
         }
     } else if ((IR & BRANCH_OPCODE) == BRANCH_OPCODE) {
-        bytes = bytes + 2;
+        bytes += 3;
     } else if (IR == NOP_OPCODE) {
-        PC++;
+        bytes += 1;
     }
 
-    PC = PC + bytes;
+    PC += bytes;
 }
 
 void executeInstruction(void) // Milan and Tabitha
