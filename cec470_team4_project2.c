@@ -10,19 +10,23 @@
 #include <string.h>
 #include <stdbool.h>
 
+// Special Opcode Masks
 #define HALT_OPCODE 0x19
 #define NOP_OPCODE 0x18
 
+// Math Opcode Masks
 #define MATH_OPCODE 0x80
 #define MATH_FUNC 0x70
 #define MATH_SRC 0x03
 #define MATH_DST 0x0C
 
+// Memory Opcode Masks
 #define MEM_OPCODE 0x00
 #define MEM_FUNC 0x08
 #define MEM_REG 0x04
 #define MEM_METH 0x03
 
+// Branch Opcode Masks
 #define BRANCH_OPCODE 0x10
 #define BRANCH_TYPE 0x07
 
@@ -94,6 +98,7 @@ void readMemory(void) // Maegan
         }
     }
     fclose(fileptr);
+    printf("Successful reading.\n");
 }
 
 void fetchNextInstruction(void) // Maegan
@@ -229,7 +234,8 @@ unsigned int mathOpSrc() // Milan
 
         case 2: 
             //Constant
-            if(0x08)
+            //if destination is MAR or Address
+            if((IR & 0x08) == 0x08)
                 src = address();
             else
                 src = memory[PC - 1];
