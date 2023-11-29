@@ -7,6 +7,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdbool.h>
 
 #define HALT_OPCODE 0x19
@@ -32,6 +33,9 @@ unsigned char ACC = 0x00;
 unsigned char IR = 0x00;
 unsigned int MAR = 0x0000;
 unsigned int PC = 0x0000;
+unsigned int bytes = 0;
+
+void readMemory(void);
 
 void fetchNextInstruction(void);
 void executeInstruction(void);
@@ -62,6 +66,7 @@ int main(int argc, char * argv[])
     {
         fetchNextInstruction();
         executeInstruction();
+        printf("%d", memory[PC]);
     }
 
     return 0;
@@ -71,21 +76,52 @@ void readMemory(void) // Maegan
 {
     fileptr = fopen("mem_in.txt", "r");
     int i = 0;
-    unsigned char c1, c2;
-    while(!feof(fileptr))
-    {
-        fscanf(fileptr, "%d", &memory[i]);
-        printf("%d\n", memory[i]);
-        i++;
-    }
+    char row[CHAR_MAX];
+    char *newRow;
+    char *byte;
 
+    while(1) {
+        fgets(row, CHAR_MAX, fileptr);
+
+        newRow = strtok(row, "\n");
+        byte = strtok(newRow, " ");
+
+        while(byte != NULL) {
+            memory[i++] = (unsigned int) strtol(byte, NULL, 16);
+            byte = strtok(NULL, " ");
+        }
+        if(feof(fileptr)) {
+            break;
+        }
+    }
     fclose(fileptr);
 }
 
 void fetchNextInstruction(void) // Maegan
 {
+    bytes = 0;
+    IR = memory[PC];
+    if((IR & MATH_OPCODE) == MATH_OPCODE) {
+        if ((IR & MATH_DST >> 2) == 0) {
+            bytes = bytes + 2;
+        } else if ((IR & MATH_DST >> 2) == 1) {
+            bytes = bytes + 1;
+        }
+    } else if ((IR & MEM_OPCODE) == MEM_OPCODE) {
+        if ((IR & MEM_METH) == 1) {
+            if ((IR & MEM_REG) >> 2) {
+                bytes = bytes + 2;
+            } else {
+                bytes = bytes + 1;
+            }
+        } else {
+            bytes = bytes + 2;
+        }
+    } else if ((IR & BRANCH_OPCODE) == BRANCH_OPCODE) {
+        bytes = bytes + 2;
+    }
 
-
+    PC = PC + bytes;
 }
 
 void executeInstruction(void) // Milan and Tabitha
@@ -111,7 +147,7 @@ void executeInstruction(void) // Milan and Tabitha
         // HALT
         case HALT_OPCODE:
             // halts program
-            printf("Stopping!\n"); 
+            printf("Stopping!\n");
             break;
 
         // NOP
@@ -198,7 +234,7 @@ unsigned int mathOpSrc() // Milan
                 src = address();
             else
                 src = memory[PC - 1];
-        
+
             break;
 
         case 3: 
@@ -266,7 +302,7 @@ unsigned int memOpMeth()
     {
         case 0: // 0b_000
         //Operand is used as address
-        opAddress = address();        
+        opAddress = address();
         break;
         
         case 1: // 0b_001
@@ -335,8 +371,8 @@ void branch () //Milan and Tabitha
             break;
     }
 
-    //Branch    
+    //Branch
     if (brch)
-        PC = address();    
-    
+        PC = address();
+
 }
