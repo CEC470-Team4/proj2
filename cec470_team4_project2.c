@@ -118,6 +118,8 @@ void fetchNextInstruction(void) // Maegan
         }
     } else if ((IR & BRANCH_OPCODE) == BRANCH_OPCODE) {
         bytes = bytes + 2;
+    } else if (IR == NOP_OPCODE) {
+        PC++;
     }
 
     PC = PC + bytes;
