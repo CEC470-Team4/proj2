@@ -66,7 +66,6 @@ int main(int argc, char * argv[])
     {
         fetchNextInstruction();
         executeInstruction();
-        printf("%d", memory[PC]);
     }
 
     return 0;
