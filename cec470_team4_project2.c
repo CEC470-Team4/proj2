@@ -54,7 +54,6 @@ bool memOpReg(void);
 unsigned int memOpMeth(void);
 
 void branch(void);
-void branch_func(void);
 
 int main(int argc, char * argv[])
 {
@@ -147,7 +146,7 @@ void executeInstruction(void) // Milan and Tabitha
 
     // Memory operations
     else if ((IR & MEM_OPCODE) == MEM_OPCODE)
-        memOpReg();
+        memOp();
 
     // Branches/Jumps
     else if ((IR & BRANCH_OPCODE) == BRANCH_OPCODE)
@@ -191,35 +190,43 @@ void mathOp()
 
     switch((IR & MATH_FUNC) >> 4)
     {
-        case 0: // 0b_000 - AND
+        // 0b_000 - AND
+        case 0: 
             *dst &= src;
             break;
 
-        case 1: // 0b_001 - OR
+        // 0b_001 - OR
+        case 1: 
             *dst |= src;
             break;
         
-        case 2: // 0b_010 - XOR
+        // 0b_010 - XOR
+        case 2: 
             *dst ^= src;
             break;
         
-        case 3: // 0b_011 - ADD
+        // 0b_011 - ADD
+        case 3: 
             *dst += src;
             break;
         
-        case 4: // 0b_100 - SUB
+        // 0b_100 - SUB
+        case 4: 
             *dst -= src;
             break;
         
-        case 5: // 0b_101 - INC
+        // 0b_101 - INC
+        case 5: 
             (*dst)++;
             break;
-        
-        case 6: // 0b_110 - DEC
+
+        // 0b_110 - DEC
+        case 6: 
             (*dst)--;
             break;
 
-        case 7: // 0b_111 - NOT
+        // 0b_111 - NOT
+        case 7: 
             *dst = ~(*dst);
             break;
     }
@@ -231,28 +238,27 @@ unsigned int mathOpSrc() // Milan
     unsigned int src = 0;
     switch ((IR & MATH_SRC))
     {
+        //Indirect (MAR used as a pointer)
         case 0:
-            //Indirect (MAR used as a pointer)
             src = memory[MAR];
             break;
 
+        //Accumulator ACC
         case 1:
-            //Accumulator ACC
             src = ACC;
             break;
 
+        //Constant
         case 2: 
-            //Constant
             //if destination is MAR or Address
             if((IR & 0x08) == 0x08)
                 src = address();
             else
                 src = memory[PC - 1];
-
             break;
 
+        //Memory
         case 3: 
-            //Memory
             src = memory[address()];
             break;
     }
@@ -276,15 +282,15 @@ unsigned int * mathOpDst() // Milan
         dst = (unsigned int *) &ACC;
         break;
 
-        case 2: 
         //Address register MAR
-        dst = &MAR;
-        break;
+        case 2: 
+            dst = &MAR;
+            break;
 
-        case 3:
         //Memory
-        dst = (unsigned int *) &memory[address()];
-        break;
+        case 3:
+            dst = (unsigned int *) &memory[address()];
+            break;
     }
 
     return dst;
@@ -294,18 +300,42 @@ unsigned int * mathOpDst() // Milan
 
 void memOp()
 {
-    unsigned int meth = memOpMeth();
-    unsigned int reg = memOpReg();
-
-    if( (IR & MEM_FUNC) >> 3) // 1 - LOAD
+    // 1 - LOAD
+    if( (IR & MEM_FUNC) >> 3) 
     {
+        // ACC
+        if (memOpReg())
+        
+            ACC = memory[memOpMeth()];
 
+        // MAR
+        else
+        
+            MAR = (memory[memOpMeth()] << 8) + memory[memOpMeth() + 1];
     }
 
-    else // 0 - STOR
+    // 0 - STOR
+    else 
     {
+        // ACC
+        if (memOpReg())
+            memory[memOpMeth()] = ACC;
 
+        // MAR
+        else
+        {
+            memory[memOpMeth()] = (MAR & 0xFF00) >> 8;
+            memory[memOpMeth() + 1] = (MAR & 0x00FF);
+        }
     }
+}
+
+bool memOpReg() // Tabitha & Milan
+{
+    // false - Accumulator ACC
+    // true - Index Register MAR
+
+     return ((IR & MEM_REG) >> 2);
 }
 
 unsigned int memOpMeth()
@@ -316,38 +346,26 @@ unsigned int memOpMeth()
     {
         case 0: // 0b_000
         //Operand is used as address
-        opAddress = address();
-        break;
+            opAddress = address();
+            break;
         
         case 1: // 0b_001
         //Operand is used as constant
-        if(memOpReg)
-        {
-
-        }
-        else
-        {
-
-        }
-
-        break;
+            // if MAR
+            if(memOpReg())
+                opAddress = PC - 1; //constant is 1 byte
+            // if ACC
+            else
+                opAddress = PC - 2; //constant is 2 bytes
+            break;
 
         case 2: // 0b_010
         //Indirect(MAR used as pointer)
-
-        break;
+            opAddress = MAR;
+            break;
     }
 
     return opAddress;
-}
-
-bool memOpReg() // Tabitha & Milan
-{
-    //returns a 1 or 0 depending on which register is used
-    // 0 - Accumulator ACC
-    // 1 - Index Register MAR
-
-     return ((IR & MEM_REG) >> 2);
 }
 
 void branch () //Milan and Tabitha
