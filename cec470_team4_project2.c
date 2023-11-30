@@ -334,14 +334,12 @@ bool memOpReg() // Tabitha & Milan
 {
     // false - Accumulator ACC
     // true - Index Register MAR
-
      return ((IR & MEM_REG) >> 2);
 }
 
 unsigned int memOpMeth()
 {
     unsigned int opAddress = 0;
-
     switch (IR & MEM_METH)
     {
         case 0: // 0b_000
@@ -371,7 +369,6 @@ unsigned int memOpMeth()
 void branch () //Milan and Tabitha
 {
     bool brch = false;
-
     switch(IR & BRANCH_TYPE)
     {
         case 0: // 0b000 - BRA
@@ -406,5 +403,4 @@ void branch () //Milan and Tabitha
     //Branch
     if (brch)
         PC = address();
-
 }
