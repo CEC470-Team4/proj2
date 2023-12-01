@@ -50,7 +50,6 @@ unsigned int mathOpSrc(void);
 unsigned int * mathOpDst(void);
 
 void memOp(void);
-bool memOpReg(void);
 unsigned int memOpMeth(void);
 
 void branch(void);
@@ -96,41 +95,99 @@ void readMemory(void) // Maegan
         }
     }
     fclose(fileptr);
-    printf("Successful reading.\n");
 }
 
-void fetchNextInstruction(void) // Maegan
-{
-    int bytes = 0;
+// void fetchNextInstruction(void) // Maegan
+// {
+//     int bytes = 0;
+//     IR = memory[PC];
+//     if((IR & MATH_OPCODE) == MATH_OPCODE) 
+//     {
+//         if ((IR & MATH_FUNC) >> 4) 
+//         {
+//             if ((IR & MATH_DST) == MATH_DST)
+//                 bytes = 2;
+//             else
+//                 bytes = 1;
+//         } 
+//         else if (((IR & MATH_DST) != MATH_DST) && (IR & MATH_DST) >> 2 == 0)
+//             bytes = 1;
+//         else if ((IR & MATH_DST) >> 2 == 2)
+//             bytes = 2;
+//         else
+//             bytes = 3;
+//     } 
+//     else if ((IR & MEM_OPCODE) == MEM_OPCODE) 
+//     {
+//         if ((IR & MEM_METH) == 1) {
+//             if ((IR & MEM_REG) >> 2) {
+//                 bytes = 2;
+//             } else {
+//                 bytes = 1;
+//             }
+//         } 
+//         else
+//             bytes = 3;
+//     } 
+//     else if ((IR & BRANCH_OPCODE) == BRANCH_OPCODE)
+//         bytes = 3;
+//     else if (IR == NOP_OPCODE)
+//         bytes = 1;
+
+//     PC += bytes;
+// }
+
+void fetchNextInstruction() {
     IR = memory[PC];
-    if((IR & MATH_OPCODE) == MATH_OPCODE) {
-        if ((IR & MATH_FUNC) >> 4) {
-            if ((IR & MATH_DST) == MATH_DST) {
-                bytes += 2;
-            } else {
-                bytes += 1;
+    int bytes = 0;
+
+    // Check if it's a math function
+    if ((IR & 0x80) == 0x80) {
+        //function is INC, DEC, or NOT
+        if((IR & 0x70)>0x40){
+            //destination is an address
+            if((IR & 0x0c)==0x0c){
+                bytes = 2;
+
+            //destination is *MAR, ACC, or MAR
+            } else{
+                bytes = 1;
             }
-        } else if (((IR & MATH_DST) != MATH_DST) && (IR & MATH_DST) >> 2 == 0) {
-            bytes += 1;
-        } else if ((IR & MATH_DST) >> 2 == 2) {
-            bytes += 2;
-        } else {
-            bytes += 3;
+        //destination is not an address AND source is *MAR or ACC
+        } else if(((IR & 0x0c) != 0x0c) && ((IR & 0x02) == 0)){
+            bytes = 1;
+
+        //destination is *MAR or ACC AND source is a constant
+        } else if((IR & 0x0b) == 2){
+            bytes = 2;
+
+        //destination OR source are an address
+        } else{
+            bytes = 3;
         }
-    } else if ((IR & MEM_OPCODE) == MEM_OPCODE) {
-        if ((IR & MEM_METH) == 1) {
-            if ((IR & MEM_REG) >> 2) {
-                bytes += 2;
-            } else {
-                bytes += 1;
-            }
-        } else {
-            bytes += 3;
+    }
+    // Check if this is a memory function
+    else if ((IR & 0xf0) == 0) {
+        //method is *MAR
+        if((IR & 0x02) == 2){
+            bytes = 1;
+
+        //register is ACC AND method is a constant
+        } else if((IR & 0x07) == 1){
+            bytes = 2;
+
+        //else, 3 bytes
+        } else{
+            bytes = 3;
         }
-    } else if ((IR & BRANCH_OPCODE) == BRANCH_OPCODE) {
-        bytes += 3;
-    } else if (IR == NOP_OPCODE) {
-        bytes += 1;
+    }
+    // Check branch function
+    else if ((IR & 0xf8) == 0x10) {
+        bytes = 3;
+    }
+    // Otherwise, it's a special opcode or an illegal opcode
+    else {
+        bytes = 1;
     }
 
     PC += bytes;
@@ -159,7 +216,6 @@ void executeInstruction(void) // Milan and Tabitha
         // HALT
         case HALT_OPCODE:
             // halts program
-            printf("Stopping!\n");
             break;
 
         // NOP
@@ -303,38 +359,30 @@ void memOp()
     // 1 - LOAD
     if( (IR & MEM_FUNC) >> 3) 
     {
-        // ACC
-        if (memOpReg())
-        
-            ACC = memory[memOpMeth()];
-
-        // MAR
-        else
-        
+        // LOAD MAR
+        if ((IR & MEM_REG) >> 2)
             MAR = (memory[memOpMeth()] << 8) + memory[memOpMeth() + 1];
+
+        // LOAD ACC
+        else
+            ACC = memory[memOpMeth()];
     }
 
     // 0 - STOR
     else 
     {
-        // ACC
-        if (memOpReg())
-            memory[memOpMeth()] = ACC;
-
-        // MAR
-        else
+        // STOR MAR
+        if ((IR & MEM_REG) >> 2)
         {
             memory[memOpMeth()] = (MAR & 0xFF00) >> 8;
             memory[memOpMeth() + 1] = (MAR & 0x00FF);
         }
-    }
-}
 
-bool memOpReg() // Tabitha & Milan
-{
-    // false - Accumulator ACC
-    // true - Index Register MAR
-     return ((IR & MEM_REG) >> 2);
+
+        // STOR ACC
+        else
+            memory[memOpMeth()] = ACC;
+    }
 }
 
 unsigned int memOpMeth()
@@ -342,22 +390,25 @@ unsigned int memOpMeth()
     unsigned int opAddress = 0;
     switch (IR & MEM_METH)
     {
-        case 0: // 0b_000
+        // 0b_000
+        case 0: 
         //Operand is used as address
             opAddress = address();
             break;
         
-        case 1: // 0b_001
+        // 0b_001
+        case 1: 
         //Operand is used as constant
             // if MAR
-            if(memOpReg())
-                opAddress = PC - 1; //constant is 1 byte
+            if((IR & MEM_REG) >> 2)
+                opAddress = PC - 2; //constant is 2 byte
             // if ACC
             else
-                opAddress = PC - 2; //constant is 2 bytes
+                opAddress = PC - 1; //constant is 1 bytes
             break;
 
-        case 2: // 0b_010
+        // 0b_010
+        case 2: 
         //Indirect(MAR used as pointer)
             opAddress = MAR;
             break;
@@ -368,6 +419,7 @@ unsigned int memOpMeth()
 
 void branch () //Milan and Tabitha
 {
+    printf("branch \n");
     bool brch = false;
     switch(IR & BRANCH_TYPE)
     {
