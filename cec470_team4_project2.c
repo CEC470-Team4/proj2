@@ -419,7 +419,6 @@ unsigned int memOpMeth()
 
 void branch () //Milan and Tabitha
 {
-    printf("branch \n");
     bool brch = false;
     switch(IR & BRANCH_TYPE)
     {
