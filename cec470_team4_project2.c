@@ -97,96 +97,44 @@ void readMemory(void) // Maegan
     fclose(fileptr);
 }
 
-// void fetchNextInstruction(void) // Maegan
-// {
-//     int bytes = 0;
-//     IR = memory[PC];
-//     if((IR & MATH_OPCODE) == MATH_OPCODE) 
-//     {
-//         if ((IR & MATH_FUNC) >> 4) 
-//         {
-//             if ((IR & MATH_DST) == MATH_DST)
-//                 bytes = 2;
-//             else
-//                 bytes = 1;
-//         } 
-//         else if (((IR & MATH_DST) != MATH_DST) && (IR & MATH_DST) >> 2 == 0)
-//             bytes = 1;
-//         else if ((IR & MATH_DST) >> 2 == 2)
-//             bytes = 2;
-//         else
-//             bytes = 3;
-//     } 
-//     else if ((IR & MEM_OPCODE) == MEM_OPCODE) 
-//     {
-//         if ((IR & MEM_METH) == 1) {
-//             if ((IR & MEM_REG) >> 2) {
-//                 bytes = 2;
-//             } else {
-//                 bytes = 1;
-//             }
-//         } 
-//         else
-//             bytes = 3;
-//     } 
-//     else if ((IR & BRANCH_OPCODE) == BRANCH_OPCODE)
-//         bytes = 3;
-//     else if (IR == NOP_OPCODE)
-//         bytes = 1;
-
-//     PC += bytes;
-// }
-
-void fetchNextInstruction() {
-    IR = memory[PC];
+void fetchNextInstruction(void) // Maegan
+{
     int bytes = 0;
+    IR = memory[PC];
 
-    // Check if it's a math function
-    if ((IR & 0x80) == 0x80) {
-        //function is INC, DEC, or NOT
-        if((IR & 0x70)>0x40){
-            //destination is an address
-            if((IR & 0x0c)==0x0c){
+    // Math Operation
+    if ((IR & MATH_OPCODE) == MATH_OPCODE) {
+        if ((IR & MATH_FUNC) >> 0x40) {
+            if ((IR & MATH_DST) == MATH_DST) {
+
                 bytes = 2;
-
-            //destination is *MAR, ACC, or MAR
-            } else{
+            } else {
                 bytes = 1;
             }
-        //destination is not an address AND source is *MAR or ACC
-        } else if(((IR & 0x0c) != 0x0c) && ((IR & 0x02) == 0)){
+        } else if (((IR & MATH_DST) != MATH_DST) && ((IR & 0x02) == 0)) {
             bytes = 1;
-
-        //destination is *MAR or ACC AND source is a constant
-        } else if((IR & 0x0b) == 2){
+        } else if ((IR & 0x0b) == 2) {
             bytes = 2;
-
-        //destination OR source are an address
-        } else{
+        } else {
             bytes = 3;
         }
-    }
-    // Check if this is a memory function
-    else if ((IR & 0xf0) == 0) {
-        //method is *MAR
-        if((IR & 0x02) == 2){
+
+    // Memory Operation
+    } else if ((IR & MEM_OPCODE) == MEM_OPCODE) {
+        if ((IR & MEM_METH) == 2) {
             bytes = 1;
-
-        //register is ACC AND method is a constant
-        } else if((IR & 0x07) == 1){
+        } else if (!((IR & MEM_REG) >> 2) && ((IR & MEM_METH) == 1)){
             bytes = 2;
-
-        //else, 3 bytes
-        } else{
+        } else {
             bytes = 3;
         }
-    }
-    // Check branch function
-    else if ((IR & 0xf8) == 0x10) {
+
+    // Branch Operation
+    } else if ((IR & BRANCH_OPCODE) == BRANCH_OPCODE) {
         bytes = 3;
-    }
-    // Otherwise, it's a special opcode or an illegal opcode
-    else {
+
+    // Special/Illegal Operations
+    } else {
         bytes = 1;
     }
 
