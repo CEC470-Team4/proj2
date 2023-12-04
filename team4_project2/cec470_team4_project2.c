@@ -158,7 +158,7 @@ void fetchNextInstruction(void) // Maegan & Milan
     PC += bytes;
 }
 
-void executeInstruction(void) // Milan and Tabitha
+void executeInstruction(void) // Milan & Tabitha
 {
     // check for regular opcodes first //
 
@@ -197,14 +197,14 @@ void executeInstruction(void) // Milan and Tabitha
 
 }
 
-unsigned int address()
+unsigned int address() // Milan
 {
     // retrieves two byte address proceeding the opcode
     // also converts address from big-endian to little-endian
     return (memory[PC - 2] << 8) + memory[PC - 1];
 }
 
-void mathOp()
+void mathOp() // Milan & Tabitha
 {
     unsigned int * dst = mathOpDst();
     unsigned int src = mathOpSrc();
@@ -254,7 +254,7 @@ void mathOp()
 
 }
 
-unsigned int * mathOpDst() // Milan
+unsigned int * mathOpDst() // Milan & Tabitha
 {
     // returns the memory address of the destination
     unsigned int *dst = NULL;
@@ -284,7 +284,7 @@ unsigned int * mathOpDst() // Milan
     return dst;
 }
 
-unsigned int mathOpSrc() // Milan
+unsigned int mathOpSrc() // Milan & Tabitha
 {
     unsigned int src = 0;
     switch (IR & MATH_SRC_MASK)
@@ -317,7 +317,7 @@ unsigned int mathOpSrc() // Milan
     return src;
 }
 
-void memOp()
+void memOp() // Milan & Tabitha
 {
     // 1 - LOAD
     if( (IR & MEM_FUNC_MASK) >> 3) 
@@ -348,7 +348,7 @@ void memOp()
     }
 }
 
-unsigned int memOpMeth()
+unsigned int memOpMeth() // Milan & Tabitha
 {
     unsigned int opAddress = 0;
     switch (IR & MEM_METH_MASK)
@@ -380,7 +380,7 @@ unsigned int memOpMeth()
     return opAddress;
 }
 
-void branch() //Milan and Tabitha
+void branch() //Milan & Tabitha
 {
     bool brch = false;
     switch(IR & BRANCH_TYPE_MASK)
